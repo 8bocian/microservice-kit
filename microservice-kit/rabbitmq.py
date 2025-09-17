@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+from aio_pika.abc import AbstractIncomingMessage, AbstractRobustConnection, AbstractRobustChannel
+from aio_pika import connect_robust, Message
+from typing import Dict, Callable, Awaitable
+from .abc import BaseLifecycleComponent
+
+
+class RabbitMQ(BaseLifecycleComponent):
+    def __init__(self, rabbitmq_url: str):
+        self._rabbitmq_url = rabbitmq_url
+
+        self.pub_connection: AbstractRobustConnection | None = None
+        self.pub_channel: AbstractRobustChannel | None = None
+
+        self.con_connection: AbstractRobustConnection | None = None
+        self.con_channels: Dict[str, AbstractRobustChannel] = {}
+        self.con_handlers: Dict[str, Callable] = {}
+
+    def subscribe(self, queue_name: str):
+        def decorator(func: Callable):
+            self.con_handlers[queue_name] = func
+            return func
+        return decorator
+
+    async def publish(self, queue_name: str, body: str):
+        if not self.pub_channel:
+            raise RuntimeError("Publisher not connected")
+        await self.pub_channel.default_exchange.publish(
+            Message(body=body.encode()),
+            routing_key=queue_name
+        )
+
+    async def start(self):
+        self.pub_connection = await connect_robust(self._rabbitmq_url)
+        self.pub_channel = self.pub_connection.channel()
+
+        self.con_connection = await connect_robust(self._rabbitmq_url)
+        for queue_name, handler in self.con_handlers.items():
+            self.con_channels[queue_name] = self.con_connection.channel()
+
+    async def stop(self):
+        if self.pub_channel:
+            await self.pub_channel.close()
+        if self.pub_connection:
+            await self.pub_connection.close()
+
+        for channel in self.con_channels.values():
+            if channel:
+                await channel.close()
+
+        if self.con_connection:
+            await self.con_connection.close()
