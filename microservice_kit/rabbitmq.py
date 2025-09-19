@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from aio_pika.abc import AbstractIncomingMessage, AbstractRobustConnection, AbstractRobustChannel
+from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel
 from aio_pika import connect_robust, Message
-from typing import Dict, Callable, Awaitable
-from .abc import BaseLifecycleComponent
+from typing import Dict, Callable
+from microservice_kit.interfaces.lifecycle_component import BaseLifecycleComponent
 
 
 class RabbitMQ(BaseLifecycleComponent):
@@ -37,7 +37,9 @@ class RabbitMQ(BaseLifecycleComponent):
 
         self.con_connection = await connect_robust(self._rabbitmq_url)
         for queue_name, handler in self.con_handlers.items():
-            self.con_channels[queue_name] = self.con_connection.channel()
+            channel = self.con_connection.channel()
+
+            self.con_channels[queue_name] = channel
 
     async def stop(self):
         if self.pub_channel:
