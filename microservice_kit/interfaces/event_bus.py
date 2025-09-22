@@ -1,6 +1,7 @@
-from .lifecycle_component import BaseLifecycleComponent
-from abc import ABC
+from .event_consumer import BaseEventConsumer
+from .event_publisher import BaseEventPublisher
+from abc import ABC, abstractmethod
 
-class BaseEventBus(BaseLifecycleComponent, ABC):
-    publisher: BaseEventPublisher
-    consumer: BaseEventConsumer
+
+class BaseEventBus(BaseEventPublisher, BaseEventConsumer, ABC):
+    pass

@@ -1,34 +1,24 @@
-from __future__ import annotations
+from typing import Callable, Awaitable
+from microservice_kit.interfaces.event_consumer import BaseEventConsumer
+from microservice_kit.interfaces.event_publisher import BaseEventPublisher
+from microservice_kit.interfaces.event_bus import BaseEventBus
 
-from aio_pika.abc import AbstractIncomingMessage, AbstractRobustConnection, AbstractRobustChannel
-from aio_pika import connect_robust, Message
-from typing import Dict, Callable, Awaitable
 
-
-class RabbitMQ(BaseLifecycleComponent):
-    def __init__(self, publisher: BaseRabbiMQPublisher, consumer: BaseRabbitMQConsumer):
+class RabbitMQ(BaseEventBus):
+    def __init__(self, publisher: BaseEventPublisher, consumer: BaseEventConsumer):
         self.publisher = publisher
         self.consumer = consumer
 
+    async def publish(self, topic: str, event: dict) -> None:
+        await self.publisher.publish(topic, event)
+
+    def subscribe(self, topic: str, handler: Callable[[dict], Awaitable[None]] | None = None) -> Callable[
+        [Callable[[dict], Awaitable[None]]], Callable[[dict], Awaitable[None]]]:
+
     async def start(self):
-        self.pub_connection = await connect_robust(self._rabbitmq_url)
-        self.pub_channel = self.pub_connection.channel()
-
-        self.con_connection = await connect_robust(self._rabbitmq_url)
-        for queue_name, handler in self.con_handlers.items():
-            channel = self.con_connection.channel()
-
-            self.con_channels[queue_name] = channel
+        await self.publisher.start()
+        await self.consumer.start()
 
     async def stop(self):
-        if self.pub_channel:
-            await self.pub_channel.close()
-        if self.pub_connection:
-            await self.pub_connection.close()
-
-        for channel in self.con_channels.values():
-            if channel:
-                await channel.close()
-
-        if self.con_connection:
-            await self.con_connection.close()
+        await self.publisher.stop()
+        await self.consumer.stop()
