@@ -1,16 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable
-
 from microservice_kit.interfaces.lifecycle_component import BaseLifecycleComponent
-
+from .types import Event
 
 class BaseEventConsumer(BaseLifecycleComponent, ABC):
     @abstractmethod
     def subscribe(
             self,
-            topic: str,
-            handler: Callable[[dict], Awaitable[None]] | None = None
-    ) -> Callable[[Callable[[dict], Awaitable[None]]], Callable[[dict], Awaitable[None]]]:
+            queue: str,
+    ) -> Callable[[Callable[[Event], Awaitable[None]]], Callable[[Event], Awaitable[None]]]:
         """
         Can be used as a decorator:
 
