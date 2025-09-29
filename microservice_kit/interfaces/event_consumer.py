@@ -5,15 +5,11 @@ from .types import Event
 
 class BaseEventConsumer(BaseLifecycleComponent, ABC):
     @abstractmethod
-    def subscribe(
-            self,
-            queue: str,
-    ) -> Callable[[Callable[[Event], Awaitable[None]]], Callable[[Event], Awaitable[None]]]:
-        """
-        Can be used as a decorator:
-
-        @consumer.subscribe("order.created")
-        async def handle_order_created(event: dict) -> None:
-            ...
-        """
+    def register_handler(self, queue: str, handler: Callable[[Event], Awaitable[None]]) -> None:
         ...
+
+    def subscribe(self, queue: str):
+        def decorator(handler: Callable[[Event], Awaitable[None]]):
+            self.register_handler(queue, handler)
+            return handler
+        return decorator
