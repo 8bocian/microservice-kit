@@ -3,7 +3,7 @@ from typing import Callable, Awaitable, Dict
 from aio_pika import connect_robust
 from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel
 
-from microservice_kit.interfaces.event_consumer import BaseEventConsumer
+from microservice_kit.interfaces.event_bus.event_consumer import BaseEventConsumer
 
 
 class RabbitMQConsumer(BaseEventConsumer):

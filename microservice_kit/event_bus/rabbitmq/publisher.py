@@ -1,6 +1,6 @@
 from aio_pika import Message, connect_robust
 from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel
-from microservice_kit.interfaces.event_publisher import BaseEventPublisher
+from microservice_kit.interfaces.event_bus.event_publisher import BaseEventPublisher
 
 
 class RabbitMQPublisher(BaseEventPublisher):

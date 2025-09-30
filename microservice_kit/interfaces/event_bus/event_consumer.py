@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable
 from microservice_kit.interfaces.lifecycle_component import BaseLifecycleComponent
-from .types import Event
+from microservice_kit.interfaces.event_bus.models import Event
 
 class BaseEventConsumer(BaseLifecycleComponent, ABC):
     @abstractmethod

@@ -1,7 +1,7 @@
 from typing import List
-from pydantic import BaseModel, validator, model_validator
+from pydantic import BaseModel, model_validator
 
-from microservice_kit.interfaces.config import BaseEventBusConfig
+from microservice_kit.interfaces.event_bus.config import BaseEventBusConfig
 
 
 class RabbitMQExchange(BaseModel):
