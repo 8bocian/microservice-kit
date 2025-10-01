@@ -1,4 +1,6 @@
 from pydantic import BaseModel
 
-class BaseEventBusConfig(BaseModel):
+
+class Routing(BaseModel):
     ...
+

@@ -3,10 +3,10 @@ from uuid import uuid4, UUID
 
 from pydantic import BaseModel, Field
 
-from microservice_kit.interfaces.event_bus.models.routing import Routing
+from microservice_kit.interfaces.message_bus.models.routing import Routing
 
 
-class Event(BaseModel):
+class Message(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     timestamp: datetime = Field(default_factory=datetime.timestamp)
     ...

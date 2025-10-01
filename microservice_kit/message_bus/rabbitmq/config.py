@@ -1,7 +1,8 @@
+from __future__ import annotations
 from typing import List
 from pydantic import BaseModel, model_validator
 
-from microservice_kit.interfaces.event_bus.config import BaseEventBusConfig
+from microservice_kit.interfaces.message_bus.config import BaseMessageBusConfig
 
 
 class RabbitMQExchange(BaseModel):
@@ -18,7 +19,7 @@ class RabbitMQConsumerConfig(BaseModel):
     queues: List[RabbitMQQueue] = []
 
 
-class RabbitMQConfig(BaseEventBusConfig):
+class RabbitMQConfig(BaseMessageBusConfig):
     publisher: RabbitMQPublisherConfig | None = None
     consumer: RabbitMQConsumerConfig | None = None
 
